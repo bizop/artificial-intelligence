@@ -31,6 +31,8 @@ import axios from 'axios';
 import FormData from 'form-data';
 
 const imgurClientId = process.env.IMGUR_CLIENT_ID; // Replace with your Imgur Client ID
+const huggingFaceAPI = process.env.HUGGINGFACE_API_KEY; // Replace with your HuggingFace API key
+const openaiAPI = process.env.OPENAI_API_KEY; // Replace with your OpenAI API key
 const inputFolder = './images'; // Folder with images
 const outputFolder = './sorted_images'; // Where to store sorted images
 
@@ -55,7 +57,7 @@ async function labelImageWithHuggingFace(imageUrl) {
     { url: imageUrl },
     {
       headers: {
-        Authorization: `Bearer ${process.env.HUGGINGFACE_API_KEY}`,
+        Authorization: `Bearer ${huggingFaceAPI}`,
       },
     }
   );
@@ -83,7 +85,7 @@ async function categorizeWithOpenAI(labels) {
     url: 'https://api.openai.com/v1/chat/completions',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+      Authorization: `Bearer ${openaiAPI}`,
     },
     data: {
       model: 'gpt-3.5-turbo-1106',
@@ -94,7 +96,6 @@ async function categorizeWithOpenAI(labels) {
   });
 
   const finalCompleteText = response.data.choices[0].message.content;
-
   return finalCompleteText.trim();
 }
 
@@ -124,8 +125,8 @@ async function processImages() {
     const categoryPath = createCategoryDirectory(category);
 
     const newFilePath = path.join(categoryPath, file);
-    fs.renameSync(filePath, newFilePath);
-    console.log(`Moved ${file} to ${newFilePath}`);
+    // fs.renameSync(filePath, newFilePath); // MOVE FILE TO NEW DIRECTORY
+    // console.log(`Moved ${file} to ${newFilePath}`);
   }
 }
 
