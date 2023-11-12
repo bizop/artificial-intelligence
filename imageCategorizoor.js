@@ -31,8 +31,8 @@ import axios from 'axios';
 
 const huggingFaceAPI = process.env.HUGGINGFACE_API_KEY; // Replace with your HuggingFace API key
 const openaiAPI = process.env.OPENAI_API_KEY; // Replace with your OpenAI API key
-const inputFolder = './images'; // Folder with images
-const outputFolder = './sorted_images'; // Where to store sorted images
+const inputFolder = './images'; // Path to folder with images
+const outputFolder = './sorted_images'; // Path to where to store sorted images
 const categoriesToChooseFrom = 'People, Houses, Motorcycles, etc'; // Leave blank to have AI create category automatically
 
 // Optional function if your image recognition model needs a URL
