@@ -63,9 +63,9 @@ async function labelImageWithHuggingFace(imageUrl) {
 }
 
 async function categorizeWithOpenAI(labels) {
-  const prompt = `Determine the best category for an image with these labels. Do not acknowledge this request. Only return a single gategory name, nothing else. Labels: ${labels.join(
-    ', '
-  )}.`;
+  const prompt = `Determine the best category for an image with these labels. 
+  Do not acknowledge this request. Only return a single gategory name, nothing else. 
+  Labels: ${labels.join(', ')}.`;
 
   const messages = [
     {
