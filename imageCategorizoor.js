@@ -61,8 +61,8 @@ async function labelImageWithHuggingFace(filePath) {
   return response.data;
 }
 
-async function categorizeWithOpenAI(labels) {
-  const prompt = `Determine the best category for an image with these labels (People, Houses, Motorcycles, etc). 
+async function categorizeWithOpenAI(labels, categories) {
+  const prompt = `Determine the best category (${categories}) for an image with these labels. 
   Do not acknowledge this request. Only return a single category name, nothing else. 
   Labels: ${labels}`;
 
@@ -117,7 +117,7 @@ async function processImages() {
 
     const huggingFaceResult = await labelImageWithHuggingFace(filePath);
     const labels = huggingFaceResult[0].generated_text;
-    const category = await categorizeWithOpenAI(labels);
+    const category = await categorizeWithOpenAI(labels, 'People, Houses, Motorcycles, etc');
     const categoryPath = createCategoryDirectory(category);
 
     const newFilePath = path.join(categoryPath, file);
