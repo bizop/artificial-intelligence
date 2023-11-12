@@ -62,7 +62,7 @@ async function labelImageWithHuggingFace(filePath) {
 }
 
 async function categorizeWithOpenAI(labels) {
-  const prompt = `Determine the best category for an image with these labels. 
+  const prompt = `Determine the best category for an image with these labels (People, Houses, Motorcycles, etc). 
   Do not acknowledge this request. Only return a single category name, nothing else. 
   Labels: ${labels}`;
 
