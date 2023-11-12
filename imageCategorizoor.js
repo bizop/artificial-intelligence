@@ -33,7 +33,7 @@ const huggingFaceAPI = process.env.HUGGINGFACE_API_KEY; // Replace with your Hug
 const openaiAPI = process.env.OPENAI_API_KEY; // Replace with your OpenAI API key
 const inputFolder = './images'; // Folder with images
 const outputFolder = './sorted_images'; // Where to store sorted images
-const categoriesToChooseFrom = 'People, Houses, Motorcycles, etc';
+const categoriesToChooseFrom = 'People, Houses, Motorcycles, etc'; // Leave blank to have AI create category automatically
 
 // Optional function if your image recognition model needs a URL
 async function uploadToImgur(filePath) {
