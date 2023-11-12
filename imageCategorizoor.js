@@ -28,14 +28,13 @@
 import fs from 'fs';
 import path from 'path';
 import axios from 'axios';
-import FormData from 'form-data';
 
-const imgurClientId = process.env.IMGUR_CLIENT_ID; // Replace with your Imgur Client ID
 const huggingFaceAPI = process.env.HUGGINGFACE_API_KEY; // Replace with your HuggingFace API key
 const openaiAPI = process.env.OPENAI_API_KEY; // Replace with your OpenAI API key
 const inputFolder = './images'; // Folder with images
 const outputFolder = './sorted_images'; // Where to store sorted images
 
+// Optional function if your image recognition model needs a URL
 async function uploadToImgur(filePath) {
   const image = fs.readFileSync(filePath);
   const formData = new FormData();
@@ -51,23 +50,21 @@ async function uploadToImgur(filePath) {
   return response.data.data.link;
 }
 
-async function labelImageWithHuggingFace(imageUrl) {
-  const response = await axios.post(
-    'https://api-inference.huggingface.co/models/hustvl/yolos-tiny',
-    { url: imageUrl },
-    {
-      headers: {
-        Authorization: `Bearer ${huggingFaceAPI}`,
-      },
-    }
-  );
+async function labelImageWithHuggingFace(filePath) {
+  const data = fs.readFileSync(filePath);
+  const response = await axios.post('https://api-inference.huggingface.co/models/Salesforce/blip-image-captioning-large', data, {
+    headers: {
+      Authorization: `Bearer ${huggingFaceAPI}`,
+      'Content-Type': 'application/octet-stream',
+    },
+  });
   return response.data;
 }
 
 async function categorizeWithOpenAI(labels) {
   const prompt = `Determine the best category for an image with these labels. 
-  Do not acknowledge this request. Only return a single gategory name, nothing else. 
-  Labels: ${labels.join(', ')}.`;
+  Do not acknowledge this request. Only return a single category name, nothing else. 
+  Labels: ${labels}`;
 
   const messages = [
     {
@@ -117,16 +114,15 @@ async function processImages() {
 
   for (const file of files) {
     const filePath = path.join(inputFolder, file);
-    const imageUrl = await uploadToImgur(filePath);
 
-    const huggingFaceResult = await labelImageWithHuggingFace(imageUrl);
-    const labels = huggingFaceResult.map((item) => item.label);
+    const huggingFaceResult = await labelImageWithHuggingFace(filePath);
+    const labels = huggingFaceResult[0].generated_text;
     const category = await categorizeWithOpenAI(labels);
     const categoryPath = createCategoryDirectory(category);
 
     const newFilePath = path.join(categoryPath, file);
-    // fs.renameSync(filePath, newFilePath); // MOVE FILE TO NEW DIRECTORY
-    // console.log(`Moved ${file} to ${newFilePath}`);
+    fs.copyFileSync(filePath, newFilePath); // Copy file to new directory
+    console.log(`Copied ${file} to ${newFilePath}`);
   }
 }
 
