@@ -63,24 +63,48 @@ async function labelImageWithHuggingFace(imageUrl) {
 }
 
 async function categorizeWithOpenAI(labels) {
-  const prompt = `Determine the best category for an image with these labels: ${labels.join(', ')}`;
-  const response = await axios.post(
-    'https://api.openai.com/v1/engines/davinci/completions',
+  const prompt = `Determine the best category for an image with these labels. Do not acknowledge this request. Only return a single gategory name, nothing else. Labels: ${labels.join(
+    ', '
+  )}.`;
+
+  const messages = [
     {
-      prompt: prompt,
-      max_tokens: 60,
+      role: 'system',
+      content: ``,
     },
     {
-      headers: {
-        Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
-      },
-    }
-  );
-  return response.data.choices[0].text.trim();
+      role: 'user',
+      content: prompt,
+    },
+  ];
+
+  const response = await axios({
+    method: 'post',
+    url: 'https://api.openai.com/v1/chat/completions',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+    },
+    data: {
+      model: 'gpt-3.5-turbo-1106',
+      messages: messages,
+      max_tokens: 60,
+      temperature: 1,
+    },
+  });
+
+  const finalCompleteText = response.data.choices[0].message.content;
+
+  return finalCompleteText.trim();
+}
+
+function sanitizeDirectoryName(name) {
+  return name.replace(/[^a-zA-Z0-9-_]/g, '_');
 }
 
 function createCategoryDirectory(category) {
-  const categoryPath = path.join(outputFolder, category);
+  const sanitizedCategory = sanitizeDirectoryName(category);
+  const categoryPath = path.join(outputFolder, sanitizedCategory);
   if (!fs.existsSync(categoryPath)) {
     fs.mkdirSync(categoryPath, { recursive: true });
   }
