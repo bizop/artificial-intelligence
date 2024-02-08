@@ -19,41 +19,46 @@
       .button:active {
         background-color: #0056b3;
       }
+      #textOutput {
+        margin-top: 20px;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        min-height: 20px;
+      }
     </style>
   </head>
   <body>
     <button id="recordButton" class="button">Record</button>
     <button id="stopButton" class="button" style="display: none">Stop</button>
     <button id="playButton" class="button" style="display: none">Play</button>
+    <div id="textOutput">Your speech will appear here...</div>
 
     <script>
-      // Setup speech recognition
       let synth = window.speechSynthesis;
       let recognition;
       let lastResult = ''; // Variable to store the last speech recognition result
       if ('webkitSpeechRecognition' in window) {
         recognition = new webkitSpeechRecognition();
         recognition.interimResults = false;
-        recognition.continuous = true; // Changed to true to allow continuous recording
+        recognition.continuous = true;
       } else {
         alert('Your browser does not support speech recognition. Please use a compatible browser like Google Chrome.');
       }
 
-      // Start recording function
       function startRecording() {
         recognition.start();
         document.getElementById('recordButton').style.display = 'none';
         document.getElementById('stopButton').style.display = 'inline-block';
+        document.getElementById('textOutput').textContent = 'Listening...'; // Reset text output
       }
 
-      // Stop recording function
       function stopRecording() {
         recognition.stop();
         document.getElementById('stopButton').style.display = 'none';
         document.getElementById('playButton').style.display = 'inline-block';
       }
 
-      // Play recorded speech
       function playRecordedSpeech() {
         let utterThis = new SpeechSynthesisUtterance(lastResult);
         synth.speak(utterThis);
@@ -61,9 +66,9 @@
 
       recognition.onresult = function (event) {
         lastResult = event.results[event.resultIndex][0].transcript;
+        document.getElementById('textOutput').textContent = lastResult; // Display the recorded speech as text
       };
 
-      // Add event listeners to buttons
       document.getElementById('recordButton').addEventListener('click', startRecording);
       document.getElementById('stopButton').addEventListener('click', stopRecording);
       document.getElementById('playButton').addEventListener('click', playRecordedSpeech);
